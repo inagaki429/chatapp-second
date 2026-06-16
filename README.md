@@ -3,6 +3,11 @@
 # 機能
 勉強用チャットアプリ
 
+# リンク
+[chatapp-second](
+  https://github.com/inagaki429/chatapp-second
+  )
+
 
 
 # テーブル設計
