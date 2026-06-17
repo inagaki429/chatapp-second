@@ -1,0 +1,65 @@
+package in.tech_camp.chatapp_second.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import in.tech_camp.chatapp_second.entity.UserEntity;
+import in.tech_camp.chatapp_second.form.LoginForm;
+import in.tech_camp.chatapp_second.form.UserForm;
+import in.tech_camp.chatapp_second.repository.UserRepository;
+import in.tech_camp.chatapp_second.service.UserService;
+import lombok.AllArgsConstructor;
+
+@Controller
+@AllArgsConstructor
+public class UserController {
+
+  private final UserRepository userRepository;
+
+    private final UserService userService;
+
+  @GetMapping("/users/sign_up")
+  public String showSignUp(Model model){
+    model.addAttribute("userForm", new UserForm());
+    return "users/signUp";
+  }
+  //サインアップ画面を表示
+
+   @PostMapping("/user")
+  public String createUser(@ModelAttribute("userForm") UserForm userForm, Model model) {
+    UserEntity userEntity = new UserEntity();
+    userEntity.setName(userForm.getName());
+    userEntity.setEmail(userForm.getEmail());
+    userEntity.setPassword(userForm.getPassword());
+    //privateのentityにsetで保存
+
+    try {
+      userService.createUserWithEncryptedPassword(userEntity);
+    } catch (Exception e) {
+      System.out.println("エラー：" + e);
+      model.addAttribute("userForm", userForm);
+      return "users/signUp";
+    }
+
+    return "redirect:/";
+  }
+
+  @GetMapping("/users/login")
+  public String loginForm(Model model){
+    model.addAttribute("loginForm", new LoginForm());
+    return "users/login";
+  }
+
+   @GetMapping("/login")
+  public String login(@RequestParam(value = "error", required = false) String error, @ModelAttribute("loginForm") LoginForm loginForm, Model model) {
+    if (error != null) {
+      model.addAttribute("loginError", "メールアドレスかパスワードが間違っています。");
+    }
+    return "users/login";
+  }
+
+}
